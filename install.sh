@@ -6,3 +6,4 @@ fi
 apt-get install python3-pip
 apt-get install mono-complete
 pip3 install -e .
+git clone https://github.com/Accenture/CLRvoyance EXCELntDonut/CLRvoyance && mv EXCELntDonut/CLRvoyance/CLRvoyance/* EXCELntDonut/CLRvoyance
