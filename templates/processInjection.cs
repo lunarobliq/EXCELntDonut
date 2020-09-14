@@ -20,7 +20,7 @@ public class Test
         else
         {
             //x64
-            shellcode = shellcode = Convert.FromBase64String("{SHELLCODE_32_HERE"}");
+            shellcode = Convert.FromBase64String("{SHELLCODE_32_HERE"}");
             process = "C:\\Windows\\System32\\mstsc.exe";
         }
 
