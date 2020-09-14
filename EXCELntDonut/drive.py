@@ -10,7 +10,7 @@ import struct
 
 '''
 Usage: 
-	python3 excelntdonut.py -f source.cs --obfuscate --sandbox
+	python3 drive.py -f source.cs --obfuscate --sandbox
 
 Options:
 	-f source.cs           C# source code (your payload must execute within the main() function)
