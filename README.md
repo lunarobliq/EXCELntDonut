@@ -33,6 +33,9 @@ If you'd like to run EXCELntDonut as just a python script, you'll need to setup 
 Usage:
 	$ EXCELntDonut -f exe_source.cs -r System.Windows.Forms.dll --sandbox --obfuscate
 
+Other Usage:
+	python3 EXCELntDonut/drive.py -f templates/processInjection.cs --obfuscate
+
 Flags:
 	(required)
 	-f path to file containing your C# soure code (exe only)
